@@ -19,33 +19,11 @@ int main()
   char graphInput1[col][lin];
   char graphInput2[col][lin];
   FILE *file1 = fopen("input.txt", "r");
-  if (file1 == NULL)
-  {
-    printf("Erro ao ler o arquivo.\n");
-    return 1;
-  }
-
-  for (int i = 0; i < lin; i++)
-  {
-    for (int j = 0; j < col; j++)
-    {
-      fscanf(file1, " %c", &graphInput1[i][j]); // percorremos o arquivo 1 e salvamos em uma matriz
-    }
-  }
-  fclose(file1);
   FILE *file2 = fopen("input2.txt", "r");
-  if (file2 == NULL)
-  {
-    printf("Erro ao ler o arquivo.\n");
-    return 1;
-  }
-  for (int i = 0; i < lin; i++)
-  {
-    for (int j = 0; j < col; j++)
-    {
-      fscanf(file2, " %c", &graphInput2[i][j]); // percorremos o arquivo 2 e salvamos em uma matriz
-    }
-  }
+  Graph G1, G2;
+  createGraph(&file1);
+  createGraph(&file2);
+  fclose(file1);
   fclose(file2);
 
   Graph G1 = createGraph(col);

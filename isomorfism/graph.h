@@ -1,36 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <list>
-
+#include "graphDefinition.h"
 using namespace std;
-
-#define col 4
-#define lin 5
-
-typedef struct node *link;
-typedef struct graph *Graph;
-
-struct vertex
-{
-  char label[20];
-  int degrN;
-  int edgeN;
-  node *adjList;
-};
-
-struct graph
-{
-  int V;
-  int A;
-  link *adj;
-};
-
-struct node
-{
-  vertex w;
-  link next;
-};
 
 static link createNewNode(vertex w, link next)
 {
@@ -40,17 +9,30 @@ static link createNewNode(vertex w, link next)
   return a;
 }
 
-Graph createGraph(int V)
+void createGraph(FILE *file, Graph g)
 {
-  Graph G = (Graph)malloc(sizeof(struct graph));
-  G->V = V;
-  G->A = 0;
-  G->adj = (link *)malloc(V * sizeof(link));
-  for (vertex v = 0; v < V; ++v)
+  if (!file)
   {
-    G->adj[v] = NULL;
+    printf("Erro ao ler o arquivo.\n");
+    exit(0);
   }
-  return G;
+  g->A = 0;
+  g->adj = 0;
+  g->V = 0;
+  CountingVertex(file, g);
+}
+
+void CountingVertex(FILE *file, Graph g)
+{
+  char c;
+  while ((c = fgetc(file)) != EOF)
+  {
+    if (c == '\n')
+    {
+      g->V++;
+    }
+  }
+  printf("Número de vértices: %d\n", g->V);
 }
 
 void insertGraph(Graph G, vertex v, vertex w)

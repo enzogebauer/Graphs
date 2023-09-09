@@ -9,7 +9,7 @@ static link createNewNode(vertex w, link next)
   return a;
 }
 
-void createGraph(FILE *file, Graph g)
+void createGraph(FILE **file, Graph g)
 {
   if (!file)
   {
@@ -20,9 +20,10 @@ void createGraph(FILE *file, Graph g)
   g->adj = 0;
   g->V = 0;
   CountingVertex(file, g);
+  // imprimir grafo
 }
 
-void CountingVertex(FILE *file, Graph g)
+void CountingVertex(FILE **file, Graph g)
 {
   char c;
   while ((c = fgetc(file)) != EOF)

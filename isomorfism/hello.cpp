@@ -21,37 +21,10 @@ int main()
   FILE *file1 = fopen("input.txt", "r");
   FILE *file2 = fopen("input2.txt", "r");
   Graph G1, G2;
-  createGraph(&file1);
-  createGraph(&file2);
+  createGraph(&file1, G1);
+  createGraph(&file2, G2);
   fclose(file1);
   fclose(file2);
-
-  Graph G1 = createGraph(col);
-  Graph G2 = createGraph(col);
-
-  for (int j = 0; j < col; j++)
-  {
-    for (int i = 1; i < lin; i++)
-    {
-      if (graphInput1[i][j] == '1') // perceorremos a matriz do grafo e inserimos um novo nó no grafico onde encontrarmos um 1 na matriz de adjacencias
-      {
-        insertGraph(G1, j, i - 1);
-      }
-    }
-  }
-
-  for (int j = 0; j < col; j++)
-  {
-    for (int i = 1; i < lin; i++)
-    {
-      if (graphInput2[i][j] == '1') // perceorremos a matriz do grafo e inserimos um novo nó no grafico onde encontrarmos um 1 na matriz de adjacencias
-      {
-        insertGraph(G2, j, i - 1);
-      }
-    }
-  }
-  printG(G1);
-  printG(G2);
 
   bool SameVertexN = CompareVertex(G1, G2);
   if (SameVertexN == false)

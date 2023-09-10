@@ -3,29 +3,23 @@
 #include <stdbool.h>
 #include <list>
 
-#define col 4
-#define lin 5
-
-typedef struct node *link;
-typedef struct graph *Graph;
-
 struct vertex
 {
   char label[20];
   int degrN;
   int edgeN;
-  node *adjList;
+  struct Node *adjList;
 };
 
-struct graph
+struct Graph
 {
   int V;
   int A;
-  link *adj;
+  vertex *root;
 };
 
-struct node
+struct Node
 {
-  vertex w;
-  link next;
+  vertex *w;
+  Node *next;
 };

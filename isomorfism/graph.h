@@ -1,144 +1,212 @@
 #include "graphDefinition.h"
 using namespace std;
+int CountingVertex(FILE **file, Graph *g);
+Node *alocateNewNode();
+void insertGraphNode(FILE **file, Graph *g);
+void adjacencyList(FILE *file, Graph *g, vertex *v);
+void insertVertex(Graph *g, char *row, vertex *v);
 
-static link createNewNode(vertex w, link next)
-{
-  link a = (link)malloc(sizeof(struct node));
-  a->w = w;
-  a->next = next;
-  return a;
-}
-
-void createGraph(FILE **file, Graph g)
+void createGraph(FILE **file, Graph *g)
 {
   if (!file)
   {
-    printf("Erro ao ler o arquivo.\n");
+    printf("Erro ao ler o fileuivo.\n");
     exit(0);
   }
+
   g->A = 0;
-  g->adj = 0;
+  g->root = 0;
   g->V = 0;
   CountingVertex(file, g);
-  // imprimir grafo
+  insertGraphNode(file, g);
 }
 
-void CountingVertex(FILE **file, Graph g)
+int CountingVertex(FILE **file, Graph *g)
 {
-  char c;
-  while ((c = fgetc(file)) != EOF)
+  rewind(*file);
+  int i, num = 0;
+
+  char row[100];
+  char *result;
+  result = fgets(row, 100, *file);
+
+  if (!result)
   {
-    if (c == '\n')
+    printf("Erro na leitura do cabeçalho.\n");
+    return 0;
+  }
+
+  int rowSize = strlen(row);
+
+  for (i = 0; i < (rowSize); i++)
+  {
+    if (isspace(row[i]))
     {
-      g->V++;
+      num++;
     }
   }
+  g->V = num;
   printf("Número de vértices: %d\n", g->V);
+
+  return (g->V);
 }
 
-void insertGraph(Graph G, vertex v, vertex w)
+void insertGraphNode(FILE **file, Graph *g)
 {
-  G->adj[v] = createNewNode(w, G->adj[v]);
-  G->A++;
-}
+  g->root = (vertex *)malloc(g->V * sizeof(vertex));
+  g->root = &g->root[0];
+  rewind(*file);
+  char row[100];
+  char *result;
+  result = fgets(row, 100, *file);
+  int i;
+  int flag = 0;
+  char *t;
 
-void printG(Graph G)
-{
-  for (vertex v = 0; v < G->V; v++)
+  for (i = 0; i < (g->V - 1); i++)
   {
-    printf("Vertex %c:", 'A' + v); // Print vertex label based on the index
-    for (link a = G->adj[v]; a != NULL; a = a->next)
+    g->root[i].degrN = 0; /*zerando o número de graus e de arestas*/
+    g->root[i].edgeN = 0;
+    if (flag == 0)
     {
-      printf(" %c", 'A' + a->w); // Print connected vertices' labels based on the index
+      t = strtok(row, " ");
+      strcpy(g->root[i].label, t); // Inserindo em cada vertice o seu nome
+      flag++;
+    }
+    else
+    {
+      t = strtok(NULL, " ");
+      strcpy(g->root[i].label, t);
+    }
+  }
+  t = strtok(NULL, "\n");
+  strcpy(g->root[i].label, t);
+
+  g->root[i].degrN = 0; // Todos os vertices iniciam com grau zero
+  g->root[i].edgeN = 0;
+  // Inserindo a lista de adjacencias
+  adjacencyList(*file, g, g->root);
+}
+
+void adjacencyList(FILE *file, Graph *g, vertex *v)
+{
+  char row[100];
+  char *result;
+  int i = 0;
+  while (!feof(file))
+  {                                 // Lê uma linha (inclusive com o '\n')
+    result = fgets(row, 100, file); // o 'fgets' lê até 99 caracteres ou até o '\n'
+    if (result)
+    { // Se foi possível ler
+      // printf("Linha %d : %s", i, linha);
+      insertVertex(g, row, &v[i++]); // Insere no vertice a sua adjc
+    }
+  }
+  // printf("\n");
+  g->A /= 2;
+}
+void insertVertex(Graph *g, char *row, vertex *v)
+{
+  char *t;
+  int flag = 0, i;
+  v->adjList = alocateNewNode();
+  struct Node *node = (*v).adjList;
+
+  node->w = v;
+
+  for (i = 0; i < (g->V) - 1; i++)
+  {
+    if (flag == 0)
+    {
+      t = strtok(row, " ");
+      if (strcmp(t, "1") == 0)
+      {
+        struct Node *newNode = alocateNewNode();
+        newNode->w = &g->root[i];
+        node->next = newNode;
+        node = newNode;
+        v->edgeN++;
+
+        if (v != &g->root[i])
+        {
+          g->root[i].degrN++;
+          g->A++;
+        }
+        else
+        {
+          g->root[i].degrN += 2;
+          g->A += 2;
+        }
+      }
+      flag++;
+    }
+    else
+    {
+      t = strtok(NULL, " ");
+      if (strcmp(t, "1") == 0)
+      {
+        struct Node *newNode = alocateNewNode();
+        newNode->w = &g->root[i];
+        node->next = newNode;
+        node = newNode;
+
+        v->edgeN++;
+
+        if (v != &g->root[i])
+        {
+          g->root[i].degrN++;
+          g->A++;
+        }
+        else
+        {
+          g->root[i].degrN += 2;
+          g->A += 2;
+        }
+      }
+    }
+  }
+
+  t = strtok(NULL, "\n");
+  if (strcmp(t, "1") == 0)
+  {
+    struct Node *newNode = alocateNewNode();
+    newNode->w = &g->root[i];
+    node->next = newNode;
+    node = newNode;
+    v->edgeN++;
+
+    if (v != &g->root[i])
+    {
+      g->root[i].degrN++;
+      g->A++;
+    }
+    else
+    {
+      g->root[i].degrN += 2;
+      g->A += 2;
+    }
+  }
+}
+Node *alocateNewNode()
+{
+  struct Node *newNode;
+  newNode = (Node *)malloc(sizeof(Node));
+  return newNode;
+}
+void printGraph(Graph *g)
+{
+  int i = 0;
+  printf("Numero total de arestas: %d\n", g->A);
+  for (i = 0; i < g->V; i++)
+  {
+    vertex *aux = &g->root[i];
+    struct Node *node = aux->adjList;
+    printf("Vertice: %s\n", aux->label);
+    while (node->next != NULL)
+    {
+      printf("%s -> %s | Num Grau: %d | Num Arestas: %d\n", g->root[i].label, node->next->w->label, g->root[i].degrN, g->root[i].edgeN);
+      node = node->next;
     }
     printf("\n");
   }
 }
-
-bool CompareVertex(Graph G1, Graph G2)
-{
-  int cont1 = 0;
-  int cont2 = 0;
-
-  for (vertex v = 0; v < G1->V; v++)
-  {
-    cont1++;
-  }
-
-  for (vertex v = 0; v < G2->V; v++)
-  {
-    cont2++;
-  }
-
-  if (cont1 == cont2)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
-bool CompareEdges(Graph G1, Graph G2)
-{
-  printf("G1->A = %d\n", G1->A);
-  printf("G2->A = %d\n", G2->A);
-  return G1->A == G2->A;
-}
-
-list<int> CompareDegree(Graph G1, Graph G2)
-{
-  list<int> degList1;
-  list<int> degList2;
-  int cont1 = 0;
-  int cont2 = 0;
-  for (vertex v = 0; v < G1->V; v++)
-  {
-    cont1 = 0;
-    cont2 = 0;
-    for (link a = G1->adj[v]; a != NULL; a = a->next)
-    {
-      cont1++;
-      printf("cont1 = %d\n", cont1);
-    }
-    degList1.push_back(cont1);
-    printf("Vertex %c do grafo1: cujo grau é %d\n", 'A' + v, cont1);
-    for (link a = G2->adj[v]; a != NULL; a = a->next)
-    {
-      cont2++;
-      printf("cont2 = %d\n", cont2);
-    }
-    degList2.push_back(cont2);
-    printf("Vertex %c do grafo2: cujo grau é %d\n", 'A' + v, cont2);
-    if (cont1 != cont2)
-    {
-      degList1.clear();
-      return degList1;
-    }
-  }
-  return degList1;
-}
-
-// bool CompareBijectivity(Graph G1, Graph G2, list<int> *degreeList)
-// {
-//   Graph mainArr[G1->A];
-//   for (vertex v = 0; v < G1->V; v++)
-//   {
-//   }
-// }
-// Um Grafo de input e outro de comparação
-// começa no primeiro nó do g1 e percorre pra achar um de mesmo grau no grau 2, achando compara suas adjacências se forem iguais passa pro próximo nó do g1 se não percorre pra achar outro de mesmo grau no g2, se não achar mais nenhum eles não são isomorfos se sim repete o processo
-
-// for(int i=0; i<tam; i++){
-//      vetG[v[i][j];
-//  compara
-// }
-
-// v sendo um vetor int da posição de graus iguais
-// i = linhas (graus iguais)
-// j = colunas (outros graus iguais)
-// matriz[i][j]
-// matriz:
-// 4 3 6 -> posições de graus iguais
-// 5 1 2 -> outra posição de graus iguais

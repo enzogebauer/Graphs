@@ -1,5 +1,11 @@
+#ifndef GRAPH_H
+#define GRAPH_H
 #include "graphDefinition.h"
-using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
 int CountingVertex(FILE **file, Graph *g);
 Node *alocateNewNode();
 void insertGraphNode(FILE **file, Graph *g);
@@ -210,3 +216,4 @@ void printGraph(Graph *g)
     printf("\n");
   }
 }
+#endif

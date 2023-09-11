@@ -1,7 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <list>
+#ifndef GRAPHDEFINITION_H
+#define GRAPHDEFINITION_H
 
 struct vertex
 {
@@ -23,3 +21,4 @@ struct Node
   vertex *w;
   Node *next;
 };
+#endif

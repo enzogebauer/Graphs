@@ -1,218 +1,222 @@
+#ifndef ISOMORFISMRULES_H
+#define ISOMORFISMRULES_H
+#include "graph.h"
+#include <iostream>
+#include "graphDefinition.h"
+#include <stdbool.h>
+#include "queue.h"
 
-
-#ifndef GRAFO_ISOMORFO
-#define GRAFO_ISOMORFO
-
-#define TRUE 1
-#define FALSE 0
-
-#include "grafo.h"
-#include "fila.h"
-#include "Bubble_Sort.h"
+using namespace std;
 
 // Verifica se os grafos fornecidos possuem o mesmo numero de vertices.
-int same_vertices(Grafo *gr1, Grafo *gr2);
+int sameVertexN(Graph *g1, Graph *g2);
 
 // Verifica se os grafos fornecidos possuem o mesmo numero de arestas.
-int same_arestas(Grafo *gr1, Grafo *gr2);
+int sameEdgesN(Graph *g1, Graph *g2);
 
 // Mapea o grafo retornando index referente a poisição d amatriz
-int mapeando_vertices(Vertice *vertice, Grafo *gr);
+int mappingVertex(vertex *v, Graph *g);
 
-int em_ordem(Grafo *gr, Vertice *vertice_chegada, int start);
+int inOrder(Graph *g, vertex *w, int start);
 
 // Verifica se os Grafos tem vertices iguais entre si
-int grafos_vertices_iguais(Grafo *gr1, Grafo *gr2);
+int equalVertex(Graph *g1, Graph *g2);
 
 // Verifica se um determiando vertice do GR1 possui os mesmos vizinhos que um determinado vertice no GR2.
 // Verifica tambem se existe os mesmos caminhos em ambos.
-int isIsomorfo(Grafo *gr1, Grafo *gr2);
+bool isIsomorfic(Graph *g1, Graph *g2);
 
 // *** Desenvolvendo as funções ***
 
-int same_vertices(Grafo *gr1, Grafo *gr2){
-    if(gr1->num_vertices == gr2->num_vertices)
-        return TRUE;
-    return FALSE;
+int sameVertexN(Graph *g1, Graph *g2)
+{
+    if (g1->V == g2->V)
+        return 1;
+    return 0;
 }
 
-int same_arestas(Grafo *gr1, Grafo *gr2){
-    if(gr1->num_aresta == gr2->num_aresta)
-        return TRUE;
-    return FALSE;
+int sameEdgesN(Graph *g1, Graph *g2)
+{
+    if (g1->A == g2->A)
+        return 1;
+    return 0;
 }
 
-int isIsomorfo(Grafo *gr1, Grafo *gr2){
-    if(!same_vertices(gr1, gr2) && !same_arestas(gr1, gr2) && (!grafos_vertices_iguais(gr1, gr2)))
-        return FALSE;
-
-    printf("VAI SE FUDER JACK\n");
-
-    int array_vizinhos[gr1->num_vertices];
-    int array_vizinhos2[gr1->num_vertices];
-    memset(array_vizinhos, 0, sizeof(array_vizinhos)); // Insere em todas as posições do vetor o valor zero
-    memset(array_vizinhos2, 0, sizeof(array_vizinhos2));
+bool isIsomorfic(Graph *g1, Graph *g2)
+{
+    int neighborArr[g1->V];
+    int neighborArr2[g1->V];
+    memset(neighborArr, 0, sizeof(neighborArr)); // Insere em todas as posições do vetor o valor zero
+    memset(neighborArr2, 0, sizeof(neighborArr2));
     int i, j, flag = 1;
-    tp_fila fila1, fila2;
-    inicializa_fila(&fila1);
-    inicializa_fila(&fila2);
-    
-    int maior_grau = gr1->raiz[0].num_graus;
-    int maior_grau_index = 0;
+    tp_fila queue1, queue2;
+    inicializa_fila(&queue1);
+    inicializa_fila(&queue2);
+    int higherDgg = g1->root[0].degrN;
+    int higherDgg_index = 0;
 
-    for(j=1; j<gr1->num_vertices; j++){
-        if(gr1->raiz[j].num_graus > maior_grau){
-            maior_grau = gr1->raiz[j].num_graus;
-            maior_grau_index = j;
+    for (j = 1; j < g1->V; j++)
+    {
+        if (g1->root[j].degrN > higherDgg)
+        {
+            higherDgg = g1->root[j].degrN;
+            higherDgg_index = j;
         }
     }
 
-    array_vizinhos[maior_grau_index] = 1;
+    neighborArr[higherDgg_index] = 1;
 
-    int valores1[maior_grau_index];
-    int valores2[maior_grau_index];
-    memset(valores1, 0, sizeof(valores1)); // Insere em todas as posições do vetor o valor zero
-    memset(valores2, 0, sizeof(valores2)); // Insere em todas as posições do vetor o valor zero
-    
-    No *no_aux = gr1->raiz[maior_grau_index].lista_adjacentes;
-    
-    j=0;
-    while(no_aux->prox_no != NULL){
-        printf("Rotulo do vertice que bie quer saber: %s\n", no_aux->vertice->rotulo);
-        valores1[j++] = em_ordem(gr1, &gr1->raiz[maior_grau_index], mapeando_vertices(no_aux->prox_no->vertice, gr1));
-        no_aux = no_aux->prox_no;
+    int value1[higherDgg_index];
+    int value2[higherDgg_index];
+    memset(value1, 0, sizeof(value1)); // Insere em todas as posições do vetor o valor zero
+    memset(value2, 0, sizeof(value2)); // Insere em todas as posições do vetor o valor zero
+
+    struct Node *aux = g1->root[higherDgg_index].adjList;
+
+    j = 0;
+    while (aux->next != NULL)
+    {
+        printf("Rotulo do vertice você deseja saber: %s\n", aux->w->label);
+        value1[j++] = inOrder(g1, &g1->root[higherDgg_index], mappingVertex(aux->next->w, g1));
+        aux = aux->next;
     }
 
-    for(j=0; j<maior_grau;j++){
-        printf("%i - ", valores1[j]);
+    for (j = 0; j < higherDgg; j++)
+    {
+        printf("%i - ", value1[j]);
     }
-    printf("\nUFA!\n");
+    printf("start: %d | rotulo: %s\n", higherDgg_index, g1->root[higherDgg_index].label);
 
-    printf("start1: %d | rotulo: %s\n", maior_grau_index, gr1->raiz[maior_grau_index].rotulo );
+    sort(value1, value1 + higherDgg);
 
-    bubbleSort(valores1, maior_grau);
+    int higherDgg2 = g2->root[0].degrN;
+    higherDgg_index = 0;
 
-    int maior_grau2 = gr2->raiz[0].num_graus;
-    maior_grau_index = 0;
-
-    for(j=1; j<gr2->num_vertices; j++){
-        if(gr2->raiz[j].num_graus > maior_grau2){
-            maior_grau2 = gr2->raiz[j].num_graus;
-            maior_grau_index = j;
+    for (j = 1; j < g2->V; j++)
+    {
+        if (g2->root[j].degrN > higherDgg2)
+        {
+            higherDgg2 = g2->root[j].degrN;
+            higherDgg_index = j;
         }
     }
 
-    array_vizinhos2[maior_grau_index] = 1;
+    neighborArr2[higherDgg_index] = 1;
 
-    //////////////////// era para ter criado uma função ////////////////////////
+    aux = g2->root[higherDgg_index].adjList;
 
-    no_aux = gr2->raiz[maior_grau_index].lista_adjacentes;
-    
-    j=0;
-    while(no_aux->prox_no != NULL){
-        printf("Rotulo do vertice que bie quer saber: %s\n", no_aux->vertice->rotulo);
-        valores2[j++] = em_ordem(gr2, &gr2->raiz[maior_grau_index], mapeando_vertices(no_aux->prox_no->vertice, gr2));
-        no_aux = no_aux->prox_no;
-    }
-    
-    if(maior_grau != maior_grau2)
-        return FALSE;
-
-    for(j=0; j<maior_grau;j++){
-        printf("%i - ", valores2[j]);
-    }
-    printf("\nUFA!\n");
-
-    printf("start2: %d | rotulo: %s\n", maior_grau_index, gr2->raiz[maior_grau_index].rotulo );
-
-    bubbleSort(valores2, maior_grau);
-
-    for(j=0; j<maior_grau; j++){
-        if(valores1[j] != valores2[j])
-            return FALSE;
+    j = 0;
+    while (aux->next != NULL)
+    {
+        printf("Rotulo do vertice: %s\n", aux->w->label);
+        value2[j++] = inOrder(g2, &g2->root[higherDgg_index], mappingVertex(aux->next->w, g2));
+        aux = aux->next;
     }
 
-    return TRUE;
+    if (higherDgg != higherDgg2)
+        return false;
+
+    for (j = 0; j < higherDgg; j++)
+    {
+        printf("%i - ", value2[j]);
+    }
+    printf("start2: %d | rotulo: %s\n", higherDgg_index, g2->root[higherDgg_index].label);
+
+    sort(value2, value2 + higherDgg);
+
+    for (j = 0; j < higherDgg; j++)
+    {
+        if (value1[j] != value2[j])
+            return false;
+    }
+
+    return true;
 }
 
-int mapeando_vertices(Vertice *vertice, Grafo *gr){
+int mappingVertex(vertex *v, Graph *g)
+{
     int i;
-    for(i=0; i<gr->num_vertices; i++){
-        if(vertice == &gr->raiz[i]){
+    for (i = 0; i < g->V; i++)
+    {
+        if (v == &g->root[i])
+        {
             return i;
         }
     }
     return -1;
 }
 
-int em_ordem(Grafo *gr, Vertice *vertice_chegada, int start){
+int inOrder(Graph *g, vertex *w, int start)
+{
+    tp_fila queue;
+    inicializa_fila(&queue);
+    insere_fila(&queue, start);
 
-    tp_fila fila;
-    inicializa_fila(&fila);
-    insere_fila(&fila, start);
+    int neighborArr[g->V];
+    memset(neighborArr, 0, sizeof(neighborArr));
 
-    int array_vizinhos[gr->num_vertices];
-    memset(array_vizinhos, 0, sizeof(array_vizinhos));
-
-    int distancia[gr->num_vertices];
-    memset(distancia, 0, sizeof(distancia));
+    int distance[g->V];
+    memset(distance, 0, sizeof(distance));
 
     int count = 0;
 
-    array_vizinhos[start] = 1;
+    neighborArr[start] = 1;
 
-    array_vizinhos[mapeando_vertices(vertice_chegada, gr)] = 1;
+    neighborArr[mappingVertex(w, g)] = 1;
 
-    while(!fila_vazia(&fila)){
+    while (!fila_vazia(&queue))
+    {
         int start1;
-        remove_fila(&fila, &start1);
-        No *no_aux1;
-        no_aux1 = gr->raiz[start1].lista_adjacentes;
+        remove_fila(&queue, &start1);
+        struct Node *no_aux1;
+        no_aux1 = g->root[start1].adjList;
 
         printf("--> s1: %d\n", start1);
-        
-        int p;
-        for(p=0; p<gr->raiz[start1].num_aresta; p++){
-            no_aux1 = no_aux1->prox_no;
-            int v = mapeando_vertices(no_aux1->vertice, gr);
-            printf("i: %i | start1: %d | P: %d\n", v, start1, p);
 
-            if((array_vizinhos[v]) && (count != 0) && (no_aux1->vertice == vertice_chegada)){
-                return distancia[start1];
+        int p;
+        for (p = 0; p < g->root[start1].edgeN; p++)
+        {
+            no_aux1 = no_aux1->next;
+            int v = mappingVertex(no_aux1->w, g);
+            printf("cont: %i | start: %d | P: %d\n", v, start1, p);
+
+            if ((neighborArr[v]) && (count != 0) && (no_aux1->w == w))
+            {
+                return distance[start1];
             }
-            if((!array_vizinhos[v])){
-                distancia[v] = 1 + distancia[start1];
-                insere_fila(&fila, v);
-                array_vizinhos[v] = 1;
+            if ((!neighborArr[v]))
+            {
+                distance[v] = 1 + distance[start1];
+                insere_fila(&queue, v);
+                neighborArr[v] = 1;
             }
         }
 
         count++;
     }
-    return FALSE;
+    return 0;
 }
 
-int grafos_vertices_iguais(Grafo *gr1, Grafo *gr2){
-    printf("entrei\n");
-    int array_visitados[gr2->num_vertices];
-    memset(array_visitados, 0, sizeof(array_visitados));
+int equalVertex(Graph *g1, Graph *g2)
+{
+    int visitedArr[g2->V];
+    memset(visitedArr, 0, sizeof(visitedArr));
     int i, j, flag = 0;
-    for(i=0; i<gr1->num_vertices; i++){
-        printf("entrei2\n");
+    for (i = 0; i < g1->V; i++)
+    {
         flag = 1;
-        for(j=0; j<gr2->num_vertices; j++){
-            printf("entrei3\n");
-            if((gr1->raiz[i].num_graus == gr2->raiz[j].num_graus) && (gr1->raiz[i].num_aresta == gr2->raiz[j].num_aresta) && (!array_visitados[j])){
-                printf("entrei4\n");
-                array_visitados[j] = 1;
+        for (j = 0; j < g2->V; j++)
+        {
+            if ((g1->root[i].degrN == g2->root[j].degrN) && (g1->root[i].edgeN == g2->root[j].edgeN) && (!visitedArr[j]))
+            {
+                visitedArr[j] = 1;
                 flag = 0;
                 break;
             }
         }
-        if(flag)
-            return FALSE;
+        if (flag)
+            return 0;
     }
-    return TRUE;
+    return 1;
 }
-
 #endif

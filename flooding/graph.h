@@ -52,7 +52,7 @@ int CountingVertex(FILE **file, Graph *g)
     }
   }
   g->V = num;
-  printf("Número de vértices: %d\n", g->V);
+  //printf("Número de vértices: %d\n", g->V);
 
   return (g->V);
 }

@@ -14,11 +14,13 @@ int maping(vertex *v, Graph *g)
             return i;
         }
     }
+    return -1;
 }
 
 void flooding(Graph *g, int *visited, int start)
 {
     tp_fila queue;
+    inicializa_fila(&queue);
     visited[start] = 1;
     insere_fila(&queue, start);
 
@@ -36,7 +38,7 @@ void flooding(Graph *g, int *visited, int start)
                 visited[v] = 1;
                 insere_fila(&queue, v);
             }
-            neighbor = neighbor->next;
+            // neighbor = neighbor->next;
         }
     }
 }
@@ -49,8 +51,10 @@ int countingConections(Graph *g)
     for (i = 0; i < g->V; i++)
     {
         if (!visited[i])
+        {
             flooding(g, visited, i);
-        count++;
+            count++;
+        }
     }
     return count;
 }

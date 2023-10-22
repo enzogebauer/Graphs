@@ -16,7 +16,7 @@ void createGraph(FILE **file, Graph *g)
 {
   if (!file)
   {
-    printf("Erro ao ler o fileuivo.\n");
+    printf("Erro ao ler o arquivo.\n");
     exit(0);
   }
 
@@ -52,7 +52,7 @@ int CountingVertex(FILE **file, Graph *g)
     }
   }
   g->V = num;
-  //printf("Número de vértices: %d\n", g->V);
+  // printf("Número de vértices: %d\n", g->V);
 
   return (g->V);
 }
@@ -111,12 +111,13 @@ void adjacencyList(FILE *file, Graph *g, vertex *v)
   // printf("\n");
   g->A /= 2;
 }
+
 void insertVertex(Graph *g, char *row, vertex *v)
 {
   char *t;
   int flag = 0, i;
   v->adjList = alocateNewNode();
-  struct Node *node = (*v).adjList;
+  struct Node *node = v->adjList;
 
   node->w = v;
 
@@ -125,10 +126,17 @@ void insertVertex(Graph *g, char *row, vertex *v)
     if (flag == 0)
     {
       t = strtok(row, " ");
-      if (strcmp(t, "1") == 0)
+      int weight = atoi(t); // Converte o token para inteiro (peso da aresta).
+      if (weight > 0)
       {
         struct Node *newNode = alocateNewNode();
+        if (newNode == NULL)
+        {
+          printf("Erro ao alocar memória para newNode.\n");
+          exit(EXIT_FAILURE);
+        }
         newNode->w = &g->root[i];
+        newNode->weight = weight; // Armazena o peso da aresta no nó.
         node->next = newNode;
         node = newNode;
         v->edgeN++;
@@ -149,10 +157,17 @@ void insertVertex(Graph *g, char *row, vertex *v)
     else
     {
       t = strtok(NULL, " ");
-      if (strcmp(t, "1") == 0)
+      int weight = atoi(t); // Converte o token para inteiro (peso da aresta).
+      if (weight > 0)
       {
         struct Node *newNode = alocateNewNode();
+        if (newNode == NULL)
+        {
+          printf("Erro ao alocar memória para newNode.\n");
+          exit(EXIT_FAILURE);
+        }
         newNode->w = &g->root[i];
+        newNode->weight = weight; // Armazena o peso da aresta no nó.
         node->next = newNode;
         node = newNode;
 
@@ -173,10 +188,17 @@ void insertVertex(Graph *g, char *row, vertex *v)
   }
 
   t = strtok(NULL, "\n");
-  if (strcmp(t, "1") == 0)
+  int weight = atoi(t); // Converte o token para inteiro (peso da aresta).
+  if (weight > 0)
   {
     struct Node *newNode = alocateNewNode();
+    if (newNode == NULL)
+    {
+      printf("Erro ao alocar memória para newNode.\n");
+      exit(EXIT_FAILURE);
+    }
     newNode->w = &g->root[i];
+    newNode->weight = weight; // Armazena o peso da aresta no nó.
     node->next = newNode;
     node = newNode;
     v->edgeN++;
@@ -193,6 +215,7 @@ void insertVertex(Graph *g, char *row, vertex *v)
     }
   }
 }
+
 Node *alocateNewNode()
 {
   struct Node *newNode;

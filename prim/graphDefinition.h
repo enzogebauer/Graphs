@@ -20,5 +20,6 @@ struct Node
 {
   vertex *w;
   Node *next;
+  int weight;
 };
 #endif

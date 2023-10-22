@@ -56,10 +56,11 @@ void primMST(Graph *g)
       node = node->next;
     }
   }
-
+  int sum = 0;
   printf("Minimum Spanning Tree (MST):\n");
   for (int i = 1; i < g->V; i++)
   {
-    printf("Edge: %s - %s (Weight: %d)\n", g->root[i].label, g->root[parent[i]].label, key[i]);
+    sum += key[i];
+    printf("Edge: %s - %s (Weight: %d)\nSoma atual: %d\n", g->root[i].label, g->root[parent[i]].label, key[i], sum);
   }
 }
